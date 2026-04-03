@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Equipment Downtime &amp; Cost Loss Calculator</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Space+Grotesk:wght@500;600&amp;display=swap');
+        
+        body {
+            font-family: 'Inter', system_ui, sans-serif;
+            background: #f8fafc;
+            color: #1e2937;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 920px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+        
+        header {
+            background: #ffffff;
+            color: #C8102E;
+            padding: 40px 40px 30px;
+            text-align: center;
+            border-bottom: 4px solid #C8102E;
+        }
+        
+        h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.4rem;
+            margin: 0;
+            font-weight: 600;
+        }
+        
+        .subtitle {
+            font-size: 1.15rem;
+            color: #475569;
+            margin-top: 8px;
+            font-weight: 400;
+        }
+        
+        main {
+            padding: 40px;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+        
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #1e2937;
+            font-size: 1rem;
+        }
+        
+        input {
+            padding: 14px 18px;
+            border: 2px solid #cbd5e1;
+            border-radius: 12px;
+            background: #ffffff;
+            color: #1e2937;
+            font-size: 1.1rem;
+            transition: all 0.2s ease;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #C8102E;
+            box-shadow: 0 0 0 4px rgba(200, 16, 46, 0.15);
+        }
+        
+        .input-group .description {
+            font-size: 0.87rem;
+            color: #64748b;
+            margin-top: 6px;
+        }
+        
+        .calculate-btn {
+            background: #C8102E;
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            border-radius: 9999px;
+            cursor: pointer;
+            margin-top: 30px;
+            width: 100%;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 15px -3px rgba(200, 16, 46, 0.3);
+        }
+        
+        .calculate-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 25px -5px rgba(200, 16, 46, 0.4);
+            background: #a30d25;
+        }
+        
+        .results {
+            margin-top: 40px;
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 30px;
+            border: 2px solid #e2e8f0;
+            display: none;
+        }
+        
+        .results.show {
+            display: block;
+        }
+        
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        
+        .total-loss {
+            font-size: 2.9rem;
+            font-weight: 600;
+            font-family: 'Space Grotesk', sans-serif;
+            color: #C8102E;
+        }
+        
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+        }
+        
+        .result-item {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .result-label {
+            font-size: 0.92rem;
+            color: #64748b;
+            margin-bottom: 6px;
+        }
+        
+        .result-value {
+            font-size: 1.45rem;
+            font-weight: 600;
+            color: #1e2937;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 24px 40px;
+            font-size: 0.9rem;
+            color: #64748b;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .example {
+            background: #f1f5f9;
+            padding: 14px 18px;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            margin-top: 20px;
+            border-left: 4px solid #C8102E;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Equipment Downtime Calculator</h1>
+            <p class="subtitle">Estimate revenue loss and total cost impact from equipment failures</p>
+        </header>
+        
+        <main>
+            <div class="form-grid">
+                <div class="input-group">
+                    <label for="incidents">Number of downtime incidents</label>
+                    <input type="number" id="incidents" value="12" min="0" step="0.1">
+                    <div class="description">How many times does this equipment go down in your chosen period (e.g., per year)?</div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="hoursPer">Average downtime per incident (hours)</label>
+                    <input type="number" id="hoursPer" value="6.5" min="0" step="0.1">
+                    <div class="description">Mean Time To Repair (MTTR) — average length of each outage</div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="revenuePerHr">Revenue per operating hour ($)</label>
+                    <input type="number" id="revenuePerHr" value="1250" min="0" step="0.01">
+                    <div class="description">How much revenue does this equipment generate per hour when running?</div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="costPerHr">Additional costs per downtime hour ($)</label>
+                    <input type="number" id="costPerHr" value="320" min="0" step="0.01">
+                    <div class="description">Labor, utilities, idle staff, penalties, etc. during downtime</div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="repairPer">Fixed repair cost per incident ($)</label>
+                    <input type="number" id="repairPer" value="850" min="0" step="0.01">
+                    <div class="description">Parts, technician call-out, or emergency service fee per breakdown</div>
+                </div>
+            </div>
+            
+            <button onclick="calculateDowntime()" class="calculate-btn">
+                Calculate Total Loss →
+            </button>
+            
+            <!-- Results -->
+            <div id="results" class="results">
+                <div class="result-header">
+                    <div>
+                        <h2 style="margin:0; font-size:1.5rem; color:#1e2937;">Estimated Financial Impact</h2>
+                        <p id="periodLabel" style="margin:6px 0 0; color:#64748b;"></p>
+                    </div>
+                    <div class="total-loss" id="totalLoss">$0.00</div>
+                </div>
+                
+                <div class="result-grid">
+                    <div class="result-item">
+                        <div class="result-label">Total downtime hours</div>
+                        <div class="result-value" id="totalHours">0 hrs</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-label">Revenue loss</div>
+                        <div class="result-value" id="revLoss">$0</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-label">Variable downtime costs</div>
+                        <div class="result-value" id="varCosts">$0</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-label">Fixed repair costs</div>
+                        <div class="result-value" id="repairCosts">$0</div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 28px; padding-top: 20px; border-top: 2px dashed #cbd5e1; font-size: 0.96rem; color: #475569;">
+                    <strong>Breakdown explanation:</strong><br>
+                    • Revenue loss = total downtime hours × revenue per operating hour<br>
+                    • Variable costs = total downtime hours × additional costs per hour<br>
+                    • Fixed costs = number of incidents × repair cost per incident
+                </div>
+                
+                <div class="example">
+                    <strong>Example:</strong> Based on your inputs, this equipment is expected to cost your business 
+                    <span id="exampleLoss" style="color:#C8102E; font-weight:600;">$0</span> in the chosen period.
+                </div>
+            </div>
+        </main>
+        
+        <div class="footer">
+            Save this page as <strong>downtime-calculator.html</strong> to use offline anytime.<br>
+            Customize the numbers above to match your specific equipment or operation.
+        </div>
+    </div>
+
+    <script>
+        function calculateDowntime() {
+            const incidents = parseFloat(document.getElementById('incidents').value) || 0;
+            const hoursPer = parseFloat(document.getElementById('hoursPer').value) || 0;
+            const revenuePerHr = parseFloat(document.getElementById('revenuePerHr').value) || 0;
+            const costPerHr = parseFloat(document.getElementById('costPerHr').value) || 0;
+            const repairPer = parseFloat(document.getElementById('repairPer').value) || 0;
+            
+            const totalHours = incidents * hoursPer;
+            const revLoss = totalHours * revenuePerHr;
+            const varCosts = totalHours * costPerHr;
+            const repairCosts = incidents * repairPer;
+            const totalLoss = revLoss + varCosts + repairCosts;
+            
+            const formatCurrency = (num) => {
+                return '$' + num.toLocaleString('en-US', { 
+                    minimumFractionDigits: 2, 
+                    maximumFractionDigits: 2 
+                });
+            };
+            
+            document.getElementById('totalHours').textContent = totalHours.toLocaleString('en-US', { minimumFractionDigits: 1 }) + ' hrs';
+            document.getElementById('revLoss').textContent = formatCurrency(revLoss);
+            document.getElementById('varCosts').textContent = formatCurrency(varCosts);
+            document.getElementById('repairCosts').textContent = formatCurrency(repairCosts);
+            document.getElementById('totalLoss').textContent = formatCurrency(totalLoss);
+            
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.classList.add('show');
+            
+            document.getElementById('periodLabel').textContent = `for ${incidents} incident${incidents === 1 ? '' : 's'}`;
+            document.getElementById('exampleLoss').textContent = formatCurrency(totalLoss);
+        }
+        
+        // Enter key support
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                const active = document.activeElement;
+                if (active.tagName === 'INPUT') {
+                    e.preventDefault();
+                    calculateDowntime();
+                }
+            }
+        });
+        
+        // Live update when results are visible
+        const inputs = document.querySelectorAll('input');
+        inputs.forEach(input => {
+            input.addEventListener('input', () => {
+                if (document.getElementById('results').classList.contains('show')) {
+                    calculateDowntime();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
